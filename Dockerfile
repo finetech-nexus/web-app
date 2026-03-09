@@ -41,6 +41,8 @@ RUN sh -c "ng build --output-path=/dist $BUILD_ENVIRONMENT_OPTIONS"
 ###############
 FROM $NGINX_IMAGE
 
+COPY default.conf /etc/nginx/conf.d/default.conf
+
 COPY --from=builder /dist/browser /usr/share/nginx/html
 
 EXPOSE 80
