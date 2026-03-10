@@ -418,7 +418,7 @@
       </div>
     }
 
-    @if (isDelinquencyEnabled()) {
+    @if (loanProductService.isLoanProduct && isDelinquencyEnabled()) {
       <div class="flex-48">
         <mat-checkbox formControlName="enableInstallmentLevelDelinquency">
           <p>{{ 'labels.inputs.Enable installment level Delinquency' | translate }}</p>
@@ -726,7 +726,7 @@
     </table>
   </div>
 
-  <div class="layout-row align-center gap-2percent margin-t responsive-column">
+  <div class="layout-row align-center gap-2percent margin-t responsive-column stepper-buttons">
     <button mat-raised-button matStepperPrevious>
       <fa-icon icon="arrow-left" class="m-r-10"></fa-icon>
       {{ 'labels.buttons.Previous' | translate }}

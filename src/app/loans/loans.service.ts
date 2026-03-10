@@ -658,6 +658,16 @@ export class LoansService {
     return this.http.post('/loans?command=calculateLoanSchedule', payload);
   }
 
+  attachLoanOriginator(loanId: string, originatorId: string): Observable<any> {
+    const emptyBody = {};
+    return this.http.post(`/loans/${loanId}/originators/${originatorId}`, emptyBody);
+  }
+
+  dettachLoanOriginator(loanId: string, originatorId: string): Observable<any> {
+    const emptyBody = {};
+    return this.http.delete(`/loans/${loanId}/originators/${originatorId}`, emptyBody);
+  }
+
   /**
    * @param loansAccount Loan account data used for the request
    * @param loansAccountTemplate Loan account template for getting product default values
@@ -770,5 +780,24 @@ export class LoansService {
 
   getLoanDisbursementDetailsData(): DisbursementData[] {
     return JSON.parse(localStorage.getItem('disbursementData'));
+  }
+
+  /**
+   * Returns the Loan Originators data
+   */
+  getLoanOriginators(loanId: any) {
+    return this.http.get(`/loans/${loanId}/originators`);
+  }
+
+  /**
+   * Get Entity Datatable Checks
+   * Used to filter datatables based on product configuration
+   * @param {number} offset Page offset
+   * @param {number} limit Number of entries
+   * @returns {Observable<any>} Entity Datatable Checks data
+   */
+  getEntityDataTableChecks(offset: number = 0, limit: number = -1): Observable<any> {
+    const httpParams = new HttpParams().set('offset', offset.toString()).set('limit', limit.toString());
+    return this.http.get('/entityDatatableChecks', { params: httpParams });
   }
 }

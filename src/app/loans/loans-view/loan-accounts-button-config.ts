@@ -90,6 +90,11 @@ export class LoansAccountButtonConfiguration {
             name: 'Reject',
             icon: 'times',
             taskPermissionName: 'REJECT_LOAN'
+          },
+          {
+            name: 'Attach Loan Originator',
+            icon: 'edit',
+            taskPermissionName: 'ATTACH_LOAN_ORIGINATOR'
           }
         ];
         break;
@@ -128,6 +133,11 @@ export class LoansAccountButtonConfiguration {
             name: 'Credit Balance Refund',
             icon: 'coins',
             taskPermissionName: 'CREATE_CREDIT_BALANCE_REFUND'
+          },
+          {
+            name: 'Make Repayment',
+            icon: 'coins',
+            taskPermissionName: 'REPAYMENT_LOAN'
           }
         ];
         break;

@@ -32,6 +32,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { NgClass, CurrencyPipe } from '@angular/common';
 import { LongTextComponent } from '../../shared/long-text/long-text.component';
 import { AccountNumberComponent } from '../../shared/account-number/account-number.component';
+import { ExternalIdentifierComponent } from '../../shared/external-identifier/external-identifier.component';
 import { MatIconButton } from '@angular/material/button';
 import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
 import { MatIcon } from '@angular/material/icon';
@@ -57,6 +58,7 @@ import { LoanProducts } from 'app/products/loan-products/loan-products';
     NgClass,
     LongTextComponent,
     AccountNumberComponent,
+    ExternalIdentifierComponent,
     MatIconButton,
     MatMenuTrigger,
     MatIcon,
@@ -85,6 +87,8 @@ export class LoansViewComponent implements OnInit {
   loanDetailsData: any;
   /** Loan Datatables */
   loanDatatables: any;
+  /** Whether datatable filtering has completed */
+  datatablesReady = false;
   /** Recalculate Interest */
   recalculateInterest: any;
   /** loan Arrears Delinquency config value */
@@ -132,6 +136,8 @@ export class LoansViewComponent implements OnInit {
           });
         }
         this.setConditionalButtons();
+        // Filter datatables based on entity datatable checks
+        this.filterDatatablesByProduct();
       }
     );
     this.loanId = this.route.snapshot.params['loanId'];
@@ -167,6 +173,76 @@ export class LoansViewComponent implements OnInit {
       this.entityType = 'Center';
     }
     this.loanDelinquencyClassification();
+  }
+
+  /**
+   * Filter datatables based on entity datatable checks configuration.
+   * Only shows datatables that are linked to the current loan's product.
+   *
+   * Logic:
+   * - If a datatable has product-specific entity checks for ANY loan product,
+   *   it is only shown for products where it is explicitly configured.
+   * - If a datatable has NO product-specific entity checks at all,
+   *   it is shown for all products (backward compatibility).
+   */
+  filterDatatablesByProduct(): void {
+    this.datatablesReady = false;
+
+    if (!this.loanDatatables || this.loanDatatables.length === 0) {
+      this.datatablesReady = true;
+      return;
+    }
+
+    const loanProductId = this.loanDetailsData?.loanProductId;
+
+    if (!loanProductId || loanProductId <= 0) {
+      this.datatablesReady = true;
+      return; // Keep all datatables if product ID is not available or invalid
+    }
+
+    this.loansService.getEntityDataTableChecks().subscribe({
+      next: (response: any) => {
+        const entityChecks = response?.pageItems || [];
+
+        // Get all entity checks for the m_loan entity
+        const loanEntityChecks = entityChecks.filter((check: any) => check.entity === 'm_loan');
+
+        if (loanEntityChecks.length === 0) {
+          this.datatablesReady = true;
+          return; // No entity datatable checks configured at all, keep all datatables
+        }
+
+        // Collect datatable names that have product-specific configurations (for ANY product)
+        const productSpecificDatatables = new Set<string>(
+          loanEntityChecks
+            .filter((check: any) => check.productId && check.productId > 0)
+            .map((check: any) => check.datatableName)
+        );
+
+        // Collect datatable names allowed for the current product
+        const allowedForCurrentProduct = new Set<string>(
+          loanEntityChecks
+            .filter((check: any) => check.productId === loanProductId)
+            .map((check: any) => check.datatableName)
+        );
+
+        // Filter: keep a datatable if:
+        // 1. It has no product-specific configuration anywhere → show for all products
+        // 2. It is explicitly configured for the current product
+        this.loanDatatables = this.loanDatatables.filter((datatable: any) => {
+          const tableName = datatable.registeredTableName;
+          if (!productSpecificDatatables.has(tableName)) {
+            return true;
+          }
+          return allowedForCurrentProduct.has(tableName);
+        });
+        this.datatablesReady = true;
+      },
+      error: () => {
+        // If API fails, keep all datatables (fallback to current behavior)
+        this.datatablesReady = true;
+      }
+    });
   }
 
   // Defines the buttons based on the status of the loan account

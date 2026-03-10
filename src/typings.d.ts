@@ -39,8 +39,18 @@ interface Window {
     mifosInterbankTransfersApiUrl?: string;
     mifosInterbankTransfersApiProvider?: string;
     mifosInterbankTransfersApiVersion?: string;
-    mifosInterbankTransfersEnabled?: boolean;
+    mifosInterbankTransfersEnabled?: string | boolean;
     minPasswordLength?: number;
+    enableExternalNationalIdSystem?: string | boolean;
+    externalNationalIdSystemUrl?: string;
+    externalNationalIdSystemApiHeader?: string;
+    externalNationalIdSystemApiKey?: string;
+    externalNationalIdRegex?: string;
+    mifosRemittanceApiUrl?: string;
+    mifosRemittanceApiProvider?: string;
+    mifosRemittanceApiVersion?: string;
+    mifosRemittanceEnabled?: string | boolean;
+    mifosRemittanceApiKey?: string;
   };
 }
 

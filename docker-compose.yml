@@ -15,7 +15,7 @@ services:
     ports:
       - '4200:80'
     environment:
-      - FINERACT_API_URLS=https://sandbox.mifos.community,https://demo.mifos.community,https://localhost:8443
+      - FINERACT_API_URLS=https://demo.mifos.community,https://localhost:8443
       - FINERACT_API_URL=https://localhost:8443
       - FINERACT_API_PROVIDER=/fineract-provider/api
       - FINERACT_API_VERSION=/v1
@@ -25,5 +25,3 @@ services:
       - MIFOS_SESSION_IDLE_TIMEOUT=300000
       - MIFOS_PRELOAD_CLIENTS=true
       - MIFOS_DEFAULT_CHAR_DELIMITER=,
-      # Production mode - set to true for minimal hero with only branding
-      - MIFOS_PRODUCTION_MODE=false

@@ -89,16 +89,19 @@ export class AdvancedAccountingMappingRuleComponent implements OnInit {
     this.sendParentData();
   }
 
-  add() {
+  fillCurrentFormValues(): void {
     this.currentFormValues = [];
-    if (this.formType == 'ChargeOffReasonExpense') {
-      this.allowAddAccountingMapping = true;
-      this.tableData.forEach((item: any) => this.currentFormValues.push(item.chargeOffReasonCodeValueId));
-      if (this.accountingMappingOptions.length == this.currentFormValues.length) {
-        this.allowAddAccountingMapping = false;
-        return;
-      }
+    this.allowAddAccountingMapping = true;
+    this.tableData.forEach((item: any) => this.currentFormValues.push(item.value.id));
+    this.allowAddAccountingMapping = !(this.accountingMappingOptions.length == this.currentFormValues.length);
+  }
+
+  add() {
+    this.fillCurrentFormValues();
+    if (!this.allowAddAccountingMapping) {
+      return;
     }
+
     const data = { ...this.getData(this.formType), pristine: false };
     const dialogRef = this.dialog.open(FormDialogComponent, { data });
     dialogRef.afterClosed().subscribe((response: any) => {
@@ -108,7 +111,7 @@ export class AdvancedAccountingMappingRuleComponent implements OnInit {
             'WriteOffReasonToExpense'
           ].includes(this.formType)) {
           const addData: AccountingMappingDTO = {
-            value: this.getValueData(response.data.value.chargeOffReasonCodeValueId),
+            value: this.getValueData(response.data.value.reasonCodeValueId),
             glAccount: this.getGlAccountData(response.data.value.expenseAccountId)
           };
           this.addTableData(addData);
@@ -123,6 +126,7 @@ export class AdvancedAccountingMappingRuleComponent implements OnInit {
           this.addTableData(addData);
         }
         this.sendParentData();
+        this.fillCurrentFormValues();
 
         if (this.formType == 'ChargeOffReasonExpense') {
           this.allowAddAccountingMapping = this.tableData.length < this.accountingMappingOptions.length;
@@ -156,6 +160,7 @@ export class AdvancedAccountingMappingRuleComponent implements OnInit {
       if (response.delete) {
         this.tableData = this.tableData.filter((_, i) => i !== index);
         this.sendParentData();
+        this.fillCurrentFormValues();
       }
     });
   }
@@ -172,7 +177,7 @@ export class AdvancedAccountingMappingRuleComponent implements OnInit {
             'WriteOffReasonToExpense'
           ].includes(this.formType)) {
           updateData = {
-            value: this.getValueData(response.data.value.chargeOffReasonCodeValueId),
+            value: this.getValueData(response.data.value.reasonCodeValueId),
             glAccount: this.getGlAccountData(response.data.value.expenseAccountId)
           };
         } else if ([
@@ -230,7 +235,7 @@ export class AdvancedAccountingMappingRuleComponent implements OnInit {
       case 'ChargeOffReasonExpense':
         return {
           title: 'Map Charge-off reasons to Expense accounts',
-          formfields: this.getChargeOffReasonExpenseFormfields(values)
+          formfields: this.getReasonsExpenseFormfields(values)
         };
       case 'BuydownFeeClassificationToIncome':
         return {
@@ -245,7 +250,7 @@ export class AdvancedAccountingMappingRuleComponent implements OnInit {
       case 'WriteOffReasonToExpense':
         return {
           title: 'Map Write-off reasons to Expense accounts',
-          formfields: this.getChargeOffReasonExpenseFormfields(values)
+          formfields: this.getReasonsExpenseFormfields(values)
         };
     }
   }
@@ -316,14 +321,14 @@ export class AdvancedAccountingMappingRuleComponent implements OnInit {
     return formfields;
   }
 
-  getChargeOffReasonExpenseFormfields(values?: any) {
+  getReasonsExpenseFormfields(values?: any) {
     const reasonOptions = this.accountingMappingOptions.filter(
       (item: any) => !this.currentFormValues.includes(item.id)
     );
     const formfields: FormfieldBase[] = [
       new SelectBase({
-        controlName: 'chargeOffReasonCodeValueId',
-        label: 'Charge-off reason',
+        controlName: 'reasonCodeValueId',
+        label: this.formType === 'ChargeOffReasonExpense' ? 'Charge-off reason' : 'Write-off reason',
         value: values ? values.value.id : reasonOptions[0].id,
         options: { label: 'name', value: 'id', data: reasonOptions },
         required: true,

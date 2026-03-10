@@ -18,12 +18,14 @@ import { UnassignStaffDialogComponent } from './custom-dialogs/unassign-staff-di
 import { UploadSignatureDialogComponent } from './custom-dialogs/upload-signature-dialog/upload-signature-dialog.component';
 import { ViewSignatureDialogComponent } from './custom-dialogs/view-signature-dialog/view-signature-dialog.component';
 import { DeleteSignatureDialogComponent } from './custom-dialogs/delete-signature-dialog/delete-signature-dialog.component';
+import { DrawSignatureDialogComponent } from './custom-dialogs/draw-signature-dialog/draw-signature-dialog.component';
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
 import { UploadImageDialogComponent } from './custom-dialogs/upload-image-dialog/upload-image-dialog.component';
 import { CaptureImageDialogComponent } from './custom-dialogs/capture-image-dialog/capture-image-dialog.component';
 
 /** Custom Services */
 import { ClientsService } from '../clients.service';
+import { LegalFormId } from '../models/legal-form.enum';
 import {
   MatCard,
   MatCardHeader,
@@ -144,9 +146,24 @@ export class ClientsViewComponent implements OnInit {
   constructor() {
     this.route.data.subscribe((data: { clientViewData: any; clientTemplateData: any; clientDatatables: any }) => {
       this.clientViewData = data.clientViewData;
-      this.clientDatatables = data.clientDatatables;
+      this.clientDatatables = this.filterDatatablesByClientSubtype(
+        data.clientDatatables,
+        data.clientViewData?.legalForm?.id
+      );
       this.clientTemplateData = data.clientTemplateData;
     });
+  }
+
+  /**
+   * Filters datatables based on the client's legal form (Person or Entity).
+   * Datatables without an entitySubType are kept visible for all client types.
+   */
+  private filterDatatablesByClientSubtype(datatables: any[], legalFormId: number): any[] {
+    if (!datatables || !legalFormId) {
+      return datatables || [];
+    }
+    const subtype = legalFormId === LegalFormId.PERSON ? 'person' : 'entity';
+    return datatables.filter((dt: any) => !dt.entitySubType || dt.entitySubType.toLowerCase() === subtype);
   }
 
   ngOnInit() {
@@ -297,6 +314,8 @@ export class ClientsViewComponent implements OnInit {
       viewSignatureDialogRef.afterClosed().subscribe((response: any) => {
         if (response.upload) {
           this.uploadSignature();
+        } else if (response.draw) {
+          this.drawSignature();
         } else if (response.delete) {
           this.deleteSignature();
         }
@@ -310,6 +329,20 @@ export class ClientsViewComponent implements OnInit {
   private uploadSignature() {
     const uploadSignatureDialogRef = this.dialog.open(UploadSignatureDialogComponent);
     uploadSignatureDialogRef.afterClosed().subscribe((signature: File) => {
+      if (signature) {
+        this.clientsService.uploadClientSignatureImage(this.clientViewData.id, signature).subscribe(() => {
+          this.reload();
+        });
+      }
+    });
+  }
+
+  /**
+   * Opens draw pad for client signature
+   */
+  private drawSignature() {
+    const drawSignatureDialogRef = this.dialog.open(DrawSignatureDialogComponent);
+    drawSignatureDialogRef.afterClosed().subscribe((signature: File) => {
       if (signature) {
         this.clientsService.uploadClientSignatureImage(this.clientViewData.id, signature).subscribe(() => {
           this.reload();

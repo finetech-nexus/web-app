@@ -32,6 +32,7 @@ import { MatNavList, MatListItem } from '@angular/material/list';
 import { MatIcon } from '@angular/material/icon';
 import { MatLine } from '@angular/material/grid-list';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { remittanceConfig } from '../../../remittances/remittance.config';
 
 import { catchError, finalize, of, take } from 'rxjs';
 
@@ -77,6 +78,8 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   mappedActivities: any[] = [];
   /** Collection of possible frequent activities */
   frequentActivities: any[] = frequentActivities;
+  /** Whether remittance feature is enabled */
+  mifosRemittanceEnabled = remittanceConfig.isRemittanceEnabled;
 
   /* Refernce of logo */
   @ViewChild('logo') logo: ElementRef<any>;
@@ -219,6 +222,9 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     position: string,
     backdrop: boolean
   ): void {
+    if (!target) {
+      return;
+    }
     setTimeout(() => this.popoverService.open(template, target, position, backdrop, {}), 200);
   }
 
@@ -226,12 +232,12 @@ export class SidenavComponent implements OnInit, AfterViewInit {
    * To show popovers
    */
   ngAfterViewInit() {
-    if (this.configurationWizardService.showSideNav) {
+    if (this.configurationWizardService.showSideNav && this.logo) {
       setTimeout(() => {
         this.showPopover(this.templateLogo, this.logo.nativeElement, 'bottom', true);
       });
     }
-    if (this.configurationWizardService.showSideNavChartofAccounts) {
+    if (this.configurationWizardService.showSideNavChartofAccounts && this.chartOfAccounts) {
       setTimeout(() => {
         this.showPopover(this.templateChartOfAccounts, this.chartOfAccounts.nativeElement, 'top', true);
       });

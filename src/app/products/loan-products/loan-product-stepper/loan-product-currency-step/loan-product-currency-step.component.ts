@@ -7,11 +7,12 @@
  */
 
 import { Component, OnInit, Input, inject } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, Validators, UntypedFormControl } from '@angular/forms';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatStepperPrevious, MatStepperNext } from '@angular/material/stepper';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+import { LoanProductService } from '../../services/loan-product.service';
 
 @Component({
   selector: 'mifosx-loan-product-currency-step',
@@ -27,6 +28,7 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
 })
 export class LoanProductCurrencyStepComponent implements OnInit {
   private formBuilder = inject(UntypedFormBuilder);
+  protected loanProductService = inject(LoanProductService);
 
   @Input() loanProductsTemplate: any;
 
@@ -40,20 +42,23 @@ export class LoanProductCurrencyStepComponent implements OnInit {
 
   ngOnInit() {
     this.currencyData = this.loanProductsTemplate.currencyOptions;
+    const currency = this.loanProductsTemplate.currency ? this.loanProductsTemplate.currency : this.currencyData[0];
+
+    let decimalPlacesValue = '';
+    if (this.loanProductService.isWorkingCapital && !this.loanProductsTemplate.id) {
+      decimalPlacesValue = '';
+    } else {
+      decimalPlacesValue =
+        currency.decimalPlaces === undefined || currency.decimalPlaces === null ? '' : currency.decimalPlaces;
+    }
+
     this.loanProductCurrencyForm.patchValue({
-      currencyCode: this.loanProductsTemplate.currency.code || this.currencyData[0].code,
-      digitsAfterDecimal:
-        this.loanProductsTemplate.currency.decimalPlaces === 0 ||
-        this.loanProductsTemplate.currency.decimalPlaces === undefined ||
-        this.loanProductsTemplate.currency.decimalPlaces === null
-          ? ''
-          : this.loanProductsTemplate.currency.decimalPlaces,
+      currencyCode: currency.code,
+      digitsAfterDecimal: decimalPlacesValue,
       inMultiplesOf:
-        this.loanProductsTemplate.currency.inMultiplesOf === 0 ||
-        this.loanProductsTemplate.currency.inMultiplesOf === undefined ||
-        this.loanProductsTemplate.currency.inMultiplesOf === null
+        currency.inMultiplesOf === 0 || currency.inMultiplesOf === undefined || currency.inMultiplesOf === null
           ? ''
-          : this.loanProductsTemplate.currency.inMultiplesOf,
+          : currency.inMultiplesOf,
       installmentAmountInMultiplesOf:
         this.loanProductsTemplate.installmentAmountInMultiplesOf === 0 ||
         this.loanProductsTemplate.installmentAmountInMultiplesOf === undefined ||
@@ -76,24 +81,20 @@ export class LoanProductCurrencyStepComponent implements OnInit {
           Validators.min(0)
         ]
       ],
-      inMultiplesOf: [
-        '',
-        [
-          Validators.required,
-          Validators.min(1)
-        ]
-      ],
-      installmentAmountInMultiplesOf: [
-        '',
-        [
-          Validators.required,
-          Validators.min(1)
-        ]
-      ]
+      inMultiplesOf: ['']
     });
+
+    if (this.loanProductService.isLoanProduct) {
+      this.loanProductCurrencyForm.addControl('installmentAmountInMultiplesOf', new UntypedFormControl(''));
+    }
   }
 
   get loanProductCurrency() {
-    return this.loanProductCurrencyForm.value;
+    const formValue = this.loanProductCurrencyForm.value;
+    const result: any = {
+      ...formValue
+    };
+
+    return result;
   }
 }

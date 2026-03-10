@@ -64,6 +64,7 @@ import {
   faMinusCircle,
   faMinus,
   faMoneyBillAlt,
+  faMoneyBillWave,
   faMoneyCheck,
   faPencilAlt,
   faPlay,
@@ -85,6 +86,7 @@ import {
   faTrash,
   faUndo,
   faUniversity,
+  faUnlink,
   faUserCircle,
   faUser,
   faUsers,
@@ -112,6 +114,7 @@ import {
   faAddressCard,
   faKeyboard,
   faInfo,
+  faInfoCircle,
   faTasks,
   faCoins,
   faPiggyBank,
@@ -132,7 +135,8 @@ import {
   faLightbulb,
   faCodeBranch,
   faHandHoldingHand,
-  faHandHoldingHeart
+  faHandHoldingHeart,
+  faCaretDown
 } from '@fortawesome/free-solid-svg-icons';
 
 /**
@@ -163,6 +167,7 @@ export class IconsModule {
       faCalendar,
       faCalendarAlt,
       faCalendarCheck,
+      faCaretDown,
       faChartBar,
       faCheck,
       faCheckCircle,
@@ -215,6 +220,7 @@ export class IconsModule {
       faMinus,
       faMinusCircle,
       faMoneyBillAlt,
+      faMoneyBillWave,
       faMoneyCheck,
       faPause,
       faPencilAlt,
@@ -264,6 +270,7 @@ export class IconsModule {
       faAddressCard,
       faKeyboard,
       faInfo,
+      faInfoCircle,
       faTasks,
       faCoins,
       faPiggyBank,
@@ -271,7 +278,8 @@ export class IconsModule {
       faUndo,
       faReceipt,
       faTableCells,
-      faSave
+      faSave,
+      faUnlink
     );
   }
 }

@@ -17,6 +17,9 @@ import env from './.env';
 // The `window.env` object is loaded in the `index.html` file
 const loadedEnv = window.env || {};
 
+const parsedMinLength = Number(loadedEnv.minPasswordLength);
+const resolvedMinPasswordLength = Number.isInteger(parsedMinLength) && parsedMinLength > 0 ? parsedMinLength : 8;
+
 export const environment = {
   production: false,
   version: env.mifos_x.version,
@@ -26,8 +29,7 @@ export const environment = {
   fineractPlatformTenantIds: loadedEnv.fineractPlatformTenantIds || 'default',
   // For connecting to others servers running elsewhere update the base API URL
   baseApiUrls:
-    loadedEnv.fineractApiUrls ||
-    'https://sandbox.mifos.community,https://demo.mifos.community,https://localhost:8443,' + window.location.origin,
+    loadedEnv.fineractApiUrls || 'https://demo.mifos.community,https://localhost:8443,' + window.location.origin,
   // For connecting to server running elsewhere set the base API URL
   baseApiUrl:
     loadedEnv.fineractApiUrl ||
@@ -58,6 +60,8 @@ export const environment = {
   defaultLanguage: loadedEnv.defaultLanguage || 'en-US',
   supportedLanguages:
     loadedEnv.supportedLanguages || 'cs-CS,de-DE,en-US,es-MX,fr-FR,it-IT,ko-KO,lt-LT,lv-LV,ne-NE,pt-PT,sw-SW',
+  defaultFormatDate: loadedEnv.defaultFormatDate || '',
+  defaultFormatDatetime: loadedEnv.defaultFormatDatetime || '',
   preloadClients: loadedEnv['preloadClients'] || true,
 
   defaultCharDelimiter: loadedEnv.defaultCharDelimiter || ',',
@@ -80,12 +84,37 @@ export const environment = {
   },
   httpCacheEnabled: loadedEnv.httpCacheEnabled || false,
 
-  mifosInterbankTransfersApiUrl: window.env?.mifosInterbankTransfersApiUrl || 'https://apis.flexcore.mx',
+  mifosInterbankTransfersApiUrl: window.env?.mifosInterbankTransfersApiUrl || 'https://apis.mifos.community',
   mifosInterbankTransfersApiProvider: window.env?.mifosInterbankTransfersApiProvider || '/vnext1',
   mifosInterbankTransfersApiVersion: window.env?.mifosInterbankTransfersApiVersion || '/v1.0',
-  mifosInterbankTransfersEnabled: window.env?.mifosInterbankTransfersEnabled ?? true,
+  mifosInterbankTransfersEnabled:
+    window.env?.mifosInterbankTransfersEnabled !== 'false' && window.env?.mifosInterbankTransfersEnabled !== false,
 
-  minPasswordLength: loadedEnv.minPasswordLength || 12,
+  /** Remittance Module Integration */
+  mifosRemittanceApiUrl: window.env?.mifosRemittanceApiClientUrl || '',
+  mifosRemittanceApiProvider: window.env?.mifosRemittanceApiProvider || '',
+  mifosRemittanceApiVersion: window.env?.mifosRemittanceApiVersion || '',
+  mifosRemittanceEnabled:
+    loadedEnv['mifosRemittanceEnabled'] !== 'false' && loadedEnv['mifosRemittanceEnabled'] !== false,
+  mifosRemittanceApiHeader: window.env?.mifosRemittanceApiClientHeader || '',
+  mifosRemittanceApiKey: window.env?.mifosRemittanceApiClientKey || '',
+
+  /**
+   * External National ID System Integration
+   * When enabled, client creation/editing will lookup external National ID
+   * and auto-fill client details (name, DOB, gender) from the external system.
+   */
+  enableExternalNationalIdSystem:
+    loadedEnv.enableExternalNationalIdSystem === 'true' || loadedEnv.enableExternalNationalIdSystem === true || false,
+  externalNationalIdSystemUrl: loadedEnv.externalNationalIdSystemUrl || '',
+  externalNationalIdSystemApiHeader: loadedEnv.externalNationalIdSystemApiHeader || '',
+  externalNationalIdSystemApiKey: loadedEnv.externalNationalIdSystemApiKey || '',
+  externalNationalIdRegex: loadedEnv.externalNationalIdRegex || '',
+
+  minPasswordLength: resolvedMinPasswordLength,
+  passwordRegex:
+    loadedEnv.passwordRegex ||
+    `^(?!.*(.)\\1)(?!.*\\s)(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\\w\\s]).{${resolvedMinPasswordLength},50}$`,
 
   /**
    * Hide client data information (mask client names with *)
@@ -93,6 +122,15 @@ export const environment = {
    */
   complianceHideClientData:
     loadedEnv.complianceHideClientData === 'true' || loadedEnv.complianceHideClientData === true || false,
+
+  /**
+   * Enable Role-Based Access Control (RBAC) for menus and buttons
+   * When enabled, menus/buttons visibility is controlled by user permissions
+   * When disabled (default), shows all menus/buttons for backward compatibility
+   * Set via MIFOS_PRODUCTION_MODE_ENABLE_RBAC env var
+   */
+  productionModeEnableRBAC:
+    loadedEnv.productionModeEnableRBAC === 'true' || loadedEnv.productionModeEnableRBAC === true || false,
 
   OIDC: {
     // Support legacy FINERACT_PLUGIN_OIDC_* variable names for backward compatibility

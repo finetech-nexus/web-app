@@ -25,8 +25,25 @@ import {
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { MatTooltip } from '@angular/material/tooltip';
+import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from '@angular/material/card';
 import { StatusLookupPipe } from '../../pipes/status-lookup.pipe';
 import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
+
+interface SavingAccount {
+  accountNo: string;
+  savingsProductName?: string;
+  status: {
+    code: string;
+    value: string;
+  };
+  summary?: {
+    accountBalance: number;
+  };
+}
+
+interface GroupData {
+  groupName?: string;
+}
 
 /**
  * GSIM Accounts Overview component.
@@ -50,6 +67,10 @@ import { STANDALONE_SHARED_IMPORTS } from 'app/standalone-shared.module';
     MatRowDef,
     MatRow,
     MatPaginator,
+    MatCard,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardContent,
     StatusLookupPipe
   ]
 })
@@ -70,9 +91,11 @@ export class GsimAccountComponent implements OnInit {
   /** Charge Overview data */
   gsimOverviewData: any;
 
-  savingAccountData: any;
+  savingAccountData: SavingAccount | null = null;
 
-  groupsData: any;
+  groupsData: GroupData | null = null;
+
+  groupId: string;
 
   /** Paginator for charge overview table. */
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -83,6 +106,11 @@ export class GsimAccountComponent implements OnInit {
    * @param {MatDialog} dialog Dialog reference.
    */
   constructor() {
+    // Get groupId from route params
+    this.route.parent?.parent?.params.subscribe((params) => {
+      this.groupId = params['groupId'];
+    });
+
     this.route.data.subscribe((data: { gsimData: any; savingAccountData: any; groupsData: any }) => {
       this.gsimOverviewData = data.gsimData[0].childGSIMAccounts;
       this.savingAccountData = data.savingAccountData;
