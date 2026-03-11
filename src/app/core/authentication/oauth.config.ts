@@ -74,9 +74,11 @@ function getOIDCConfig(): AuthConfig {
  */
 function getOAuth2Config(): AuthConfig {
   const frontendUrl = window.location.origin;
+  // Issuer used for discovery document. When issuerUrl is set (e.g. Keycloak), discovery loads from IdP; serverUrl remains for userdetails (Fineract).
+  const issuer = environment.oauth.issuerUrl || environment.oauth.serverUrl;
 
   return {
-    issuer: environment.oauth.serverUrl,
+    issuer,
     loginUrl: environment.oauth.authorizeUrl,
     tokenEndpoint: environment.oauth.tokenUrl,
     redirectUri: environment.oauth.redirectUri,

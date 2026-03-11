@@ -39,6 +39,7 @@ export const environment = {
   serverUrl: '',
   oauth: {
     enabled: loadedEnv.oauthServerEnabled === true,
+    issuerUrl: loadedEnv.oauthIssuerUrl || '',
     serverUrl: loadedEnv.oauthServerUrl || '',
     logoutUrl: loadedEnv.oauthServerLogoutUrl || '',
     appId: loadedEnv.oauthAppId || '',

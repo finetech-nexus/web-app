@@ -43,6 +43,8 @@ export const environment = {
   enableRememberMe: false,
   oauth: {
     enabled: loadedEnv.oauthServerEnabled === true,
+    /** IdP issuer URL for OAuth2 discovery (e.g. Keycloak realm). When set, discovery is loaded from here; serverUrl is used for userdetails only. */
+    issuerUrl: loadedEnv.oauthIssuerUrl || '',
     serverUrl: loadedEnv.oauthServerUrl || '',
     logoutUrl: loadedEnv.oauthServerLogoutUrl || '',
     appId: loadedEnv.oauthAppId || '',

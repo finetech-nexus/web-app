@@ -59,6 +59,9 @@
   // OAuth Server Enabled
   window['env']['oauthServerEnabled'] = false;
 
+  // OAuth Issuer URL (IdP discovery)
+  window['env']['oauthIssuerUrl'] = '';
+
   // OAuth Server URL
   window['env']['oauthServerUrl'] = '';
 

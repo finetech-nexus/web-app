@@ -350,7 +350,8 @@ MIFOS_PASSWORD_REGEX=^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,50}$
 | Variable                      | Description                                      | Default Value |
 | ----------------------------- | ------------------------------------------------ | ------------- |
 | MIFOS_OAUTH_SERVER_ENABLED    | Enable the use of OAuth2 server                  | false         |
-| MIFOS_OAUTH_SERVER_URL        | Set the OAuth2 server URL (issuer)               |               |
+| MIFOS_OAUTH_ISSUER_URL        | IdP issuer URL for OAuth2 discovery (e.g. Keycloak realm). When set, discovery loads from here; userdetails use MIFOS_OAUTH_SERVER_URL. |               |
+| MIFOS_OAUTH_SERVER_URL        | OAuth2 server URL for userdetails (e.g. Fineract API). Also used as fallback issuer when MIFOS_OAUTH_ISSUER_URL is not set. |               |
 | MIFOS_OAUTH_SERVER_LOGOUT_URL | Set the OAuth2 server logout URL                 |               |
 | MIFOS_OAUTH_CLIENT_ID         | Set the OAuth2 Client Id                         |               |
 | MIFOS_OAUTH_AUTHORIZE_URL     | Set the OAuth2 authorization endpoint URL        |               |

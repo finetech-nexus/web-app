@@ -67,7 +67,10 @@
   // OAuth Server Enabled
   window['env']['oauthServerEnabled'] = '$MIFOS_OAUTH_SERVER_ENABLED' === 'true';
 
-  // OAuth Server URL
+  // OAuth Issuer URL (IdP discovery, e.g. Keycloak realm). When set, discovery is loaded from here; serverUrl is used for userdetails only.
+  window['env']['oauthIssuerUrl'] = '$MIFOS_OAUTH_ISSUER_URL';
+
+  // OAuth Server URL (used for userdetails and as fallback issuer when MIFOS_OAUTH_ISSUER_URL is not set)
   window['env']['oauthServerUrl'] = '$MIFOS_OAUTH_SERVER_URL';
 
   // OAuth Server Logout URL
